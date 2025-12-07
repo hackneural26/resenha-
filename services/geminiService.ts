@@ -3,7 +3,9 @@ import { InputContext, AIProcessResult } from '../types';
 import { INITIAL_ITEMS } from '../constants';
 
 const getClient = () => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = (typeof import.meta !== 'undefined' && (import.meta as any).env)
+    ? (import.meta as any).env.VITE_GEMINI_API_KEY
+    : (process.env && (process.env as any).VITE_GEMINI_API_KEY);
   
   if (!apiKey) {
     console.error("❌ ERRO CRÍTICO: VITE_GEMINI_API_KEY não configurada no arquivo .env.local");
