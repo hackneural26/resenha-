@@ -25,6 +25,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>(items[0].id);
+  const [bulkByName, setBulkByName] = useState('');
   
   const handleManualSubmit = (delta: number) => {
     let field: keyof SkewerItem;
@@ -34,6 +35,53 @@ export const ActionCard: React.FC<ActionCardProps> = ({
     else field = 'leftover';
 
     onUpdate(selectedItem, field, delta);
+  };
+
+  const handleBulkByName = () => {
+    const text = bulkByName.trim();
+    if (!text) return;
+
+    // Expect format: "Nome 5, Outro 3" or "Nome:5,Outro:3"
+    const parts = text.split(',').map(p => p.trim()).filter(Boolean);
+    const errors: string[] = [];
+    parts.forEach(part => {
+      const colonMatch = part.match(/^(.+):\s*(\d+)$/);
+      const spaceMatch = part.match(/^(.+)\s+(\d+)$/);
+      const m = colonMatch || spaceMatch;
+      if (!m) {
+        errors.push(part);
+        return;
+      }
+
+      const namePart = m[1].trim().toLowerCase();
+      const qty = Number(m[2]);
+      if (Number.isNaN(qty)) {
+        errors.push(part);
+        return;
+      }
+
+      // Find item by name (case-insensitive contains) or exact id
+      const found = items.find(i => i.name.toLowerCase().includes(namePart) || i.id.toLowerCase() === namePart);
+      if (!found) {
+        errors.push(part);
+        return;
+      }
+
+      // Map context to field
+      let field: keyof SkewerItem;
+      if (context === 'SALES') field = 'sold';
+      else if (context === 'ENTRY') field = 'stock';
+      else field = 'leftover';
+
+      // Apply update (delta)
+      onUpdate(found.id, field, qty);
+    });
+
+    if (errors.length) {
+      alert('Não foi possível entender: ' + errors.join(', '));
+    } else {
+      setBulkByName('');
+    }
   };
 
   const handleAISubmit = async (e: React.FormEvent) => {
@@ -107,6 +155,23 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             ))}
           </select>
 
+          {/* Bulk by name input */}
+          <label className="block text-sm font-medium text-gray-600 mt-2">Inserir por nomes (ex: "Contra Filé 5, Queijo 2")</label>
+          <div className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={bulkByName}
+              onChange={(e) => setBulkByName(e.target.value)}
+              placeholder={context === 'ENTRY' ? "Ex: Queijo 5, Frango 2" : "Ex: Carne 3, Queijo 1"}
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={handleBulkByName}
+              className="py-2 px-3 bg-blue-600 text-white rounded-md font-bold"
+            >
+              Aplicar
+            </button>
+          </div>
           {/* Botões de Ação */}
           <div className="flex flex-col gap-3">
             
