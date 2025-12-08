@@ -41,27 +41,56 @@ export const ActionCard: React.FC<ActionCardProps> = ({
     const text = bulkByName.trim();
     if (!text) return;
 
-    // Expect format: "Nome 5, Outro 3" or "Nome:5,Outro:3"
-    const parts = text.split(',').map(p => p.trim()).filter(Boolean);
+    const numberWords: Record<string, number> = {
+      'zero': 0, 'um': 1, 'uma': 1, 'dois': 2, 'duas': 2, 'três': 3, 'tres': 3,
+      'quatro': 4, 'cinco': 5, 'seis': 6, 'sete': 7, 'oito': 8, 'nove': 9,
+      'dez': 10, 'onze': 11, 'doze': 12, 'treze': 13, 'catorze': 14, 'quatorze': 14,
+      'quinze': 15, 'dezesseis': 16, 'dezessete': 17, 'dezoito': 18, 'dezenove': 19,
+      'vinte': 20
+    };
+
+    const parts = text.split(/[.,;]+/).map(p => p.trim()).filter(Boolean);
     const errors: string[] = [];
+
+    const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9\s]/g, '').trim();
+
     parts.forEach(part => {
-      const colonMatch = part.match(/^(.+):\s*(\d+)$/);
-      const spaceMatch = part.match(/^(.+)\s+(\d+)$/);
-      const m = colonMatch || spaceMatch;
-      if (!m) {
+      let qty: number | null = null;
+      let namePart: string | null = null;
+
+      // Try patterns like: "2 espeto de nome" or "dois espeto de nome"
+      let m = part.match(/^(\d+|[a-zA-ZÀ-ÿ]+)\s+(?:espeto?s?|unidades?|unid)?(?:\s+de\s+)?(.+)$/i);
+      if (m) {
+        const numStr = m[1];
+        const maybeName = m[2];
+        if (/^\d+$/.test(numStr)) qty = Number(numStr);
+        else {
+          const n = numStr.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+          qty = numberWords[n] ?? null;
+        }
+        namePart = maybeName;
+      } else {
+        // Try patterns like: "nome 2" or "nome dois"
+        m = part.match(/^(.+?)\s+(\d+|[a-zA-ZÀ-ÿ]+)$/i);
+        if (m) {
+          const maybeName = m[1];
+          const numStr = m[2];
+          if (/^\d+$/.test(numStr)) qty = Number(numStr);
+          else {
+            const n = numStr.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+            qty = numberWords[n] ?? null;
+          }
+          namePart = maybeName;
+        }
+      }
+
+      if (qty === null || !namePart) {
         errors.push(part);
         return;
       }
 
-      const namePart = m[1].trim().toLowerCase();
-      const qty = Number(m[2]);
-      if (Number.isNaN(qty)) {
-        errors.push(part);
-        return;
-      }
-
-      // Find item by name (case-insensitive contains) or exact id
-      const found = items.find(i => i.name.toLowerCase().includes(namePart) || i.id.toLowerCase() === namePart);
+      const cleaned = normalize(namePart);
+      const found = items.find(i => normalize(i.name).includes(cleaned) || i.id.toLowerCase() === cleaned.replace(/\s+/g, '_'));
       if (!found) {
         errors.push(part);
         return;
@@ -73,15 +102,11 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       else if (context === 'ENTRY') field = 'stock';
       else field = 'leftover';
 
-      // Apply update (delta)
       onUpdate(found.id, field, qty);
     });
 
-    if (errors.length) {
-      alert('Não foi possível entender: ' + errors.join(', '));
-    } else {
-      setBulkByName('');
-    }
+    if (errors.length) alert('Não foi possível entender: ' + errors.join(' / '));
+    setBulkByName('');
   };
 
   const handleAISubmit = async (e: React.FormEvent) => {
