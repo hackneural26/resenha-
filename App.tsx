@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Package, Flame, Save, Trash2, FileSpreadsheet, MessageCircle, Eraser, Settings, Phone, X } from 'lucide-react';
+import { ShoppingCart, Package, Flame, Save, Trash2, FileSpreadsheet, MessageCircle, Eraser, Settings, Phone, X, Plus } from 'lucide-react';
 import { SkewerItem } from './types';
 import { INITIAL_ITEMS, PACK_SIZE } from './constants';
 import { ActionCard } from './components/ActionCard';
@@ -21,6 +21,11 @@ const App: React.FC = () => {
   // Settings Modal State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [tempPhone, setTempPhone] = useState('');
+
+  // Add Item Modal State
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newStock, setNewStock] = useState<number | ''>('');
 
   // Persist items whenever they change
   useEffect(() => {
@@ -64,6 +69,45 @@ const App: React.FC = () => {
   const openSettings = () => {
     setTempPhone(bossPhone);
     setIsSettingsOpen(true);
+  };
+
+  const openAddModal = () => {
+    setNewName('');
+    setNewStock('');
+    setIsAddOpen(true);
+  };
+
+  const slugifyId = (name: string) => {
+    return name.toLowerCase().trim().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  };
+
+  const handleAddItem = () => {
+    const name = newName.trim();
+    if (!name) {
+      alert('Informe o nome do espeto.');
+      return;
+    }
+
+    const stockValue = typeof newStock === 'number' ? newStock : 0;
+
+    let baseId = slugifyId(name);
+    let id = baseId;
+    let counter = 1;
+    while (items.find(i => i.id === id)) {
+      id = `${baseId}_${counter}`;
+      counter++;
+    }
+
+    const newItem = {
+      id,
+      name,
+      stock: Math.max(0, stockValue),
+      sold: 0,
+      leftover: 0
+    };
+
+    setItems(prev => [...prev, newItem]);
+    setIsAddOpen(false);
   };
 
   const saveSettings = () => {
@@ -226,6 +270,60 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Add Item Modal */}
+      {isAddOpen && (
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <Plus className="w-5 h-5" /> Adicionar Espeto
+              </h3>
+              <button onClick={() => setIsAddOpen(false)} className="text-gray-400 hover:text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-600 mb-4 text-sm">Informe o nome do espeto e o estoque inicial (opcional).</p>
+
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nome do Espeto</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Ex: Espeto de Alho"
+                className="w-full text-lg p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                autoFocus
+              />
+
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-1 mt-4">Estoque inicial (opcional)</label>
+              <input
+                type="number"
+                value={newStock === '' ? '' : String(newStock)}
+                onChange={(e) => setNewStock(e.target.value === '' ? '' : Number(e.target.value))}
+                placeholder="0"
+                className="w-full text-lg p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setIsAddOpen(false)}
+                  className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-lg"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleAddItem}
+                  className="flex-1 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 shadow-md"
+                >
+                  ADICIONAR
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-gray-900 text-white p-4 shadow-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
@@ -241,6 +339,14 @@ const App: React.FC = () => {
           
           <div className="flex gap-2">
              <button 
+              onClick={openAddModal}
+              className="bg-green-700 hover:bg-green-600 text-white transition-colors flex items-center justify-center p-2 rounded shadow-sm border border-green-600"
+              title="Adicionar novo espeto"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+
+            <button 
               onClick={openSettings}
               className="bg-gray-700 hover:bg-gray-600 text-white transition-colors flex items-center justify-center p-2 rounded shadow-sm border border-gray-600"
               title="Configurar Número do Patrão"
