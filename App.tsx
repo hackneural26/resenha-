@@ -348,7 +348,7 @@ const App: React.FC = () => {
 
             <button 
               onClick={openSettings}
-              className="bg-gray-700 hover:bg-gray-600 text-white transition-colors flex items-center justify-center p-2 rounded shadow-sm border border-gray-600"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors flex items-center justify-center p-2 rounded shadow-sm border border-gray-300"
               title="Configurar Número do Patrão"
             >
               <Settings className="w-5 h-5" />
@@ -356,7 +356,7 @@ const App: React.FC = () => {
 
             <button 
               onClick={handleClearDailyMetricsOnly}
-              className="bg-yellow-600 hover:bg-yellow-500 text-white transition-colors flex items-center gap-1 text-[10px] md:text-xs uppercase font-bold border border-yellow-500 px-2 py-2 rounded shadow-sm"
+              className="bg-yellow-200 hover:bg-yellow-300 text-yellow-800 transition-colors flex items-center gap-1 text-[10px] md:text-xs uppercase font-bold border border-yellow-300 px-2 py-2 rounded shadow-sm"
               title="Limpar apenas Vendas e Sobras, manter Estoque"
             >
               <Eraser className="w-4 h-4" />
@@ -365,7 +365,7 @@ const App: React.FC = () => {
             </button>
             <button 
               onClick={resetData}
-              className="bg-red-900 hover:bg-red-700 text-white transition-colors flex items-center gap-1 text-[10px] md:text-xs uppercase font-bold border border-red-700 px-2 py-2 rounded shadow-sm"
+              className="bg-red-200 hover:bg-red-300 text-red-800 transition-colors flex items-center gap-1 text-[10px] md:text-xs uppercase font-bold border border-red-300 px-2 py-2 rounded shadow-sm"
               title="Apagar tudo e começar do zero"
             >
               <Trash2 className="w-4 h-4" />
