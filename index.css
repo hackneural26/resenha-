@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* index.css - app global styles
+   This file exists to avoid 404 when loading /index.css from index.html.
+   If you want Tailwind via CDN it's fine; add custom styles here.
+*/
+
+:root {
+  --app-bg: #f3f4f6;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--app-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

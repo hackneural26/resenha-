@@ -7,12 +7,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   // Tenta encontrar a chave em várias variações de nome para facilitar
-  const apiKey = env.API_KEY || env.VITE_API_KEY || env.GOOGLE_API_KEY || '';
-
-  if (!apiKey) {
-    console.warn("⚠️ AVISO: Nenhuma API Key encontrada. A IA de voz não funcionará.");
-    console.warn("No CodeSandbox: Adicione 'API_KEY' na aba 'Secrets' ou 'Env'.");
-  }
+  const apiKey = env.VITE_GEMINI_API_KEY || env.API_KEY || env.VITE_API_KEY || env.GOOGLE_API_KEY || '';
 
   return {
     plugins: [react()],
