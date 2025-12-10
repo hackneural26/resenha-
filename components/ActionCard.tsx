@@ -33,7 +33,8 @@ export const ActionCard: React.FC<ActionCardProps> = ({
     
     if (context === 'SALES') field = 'sold';
     else if (context === 'ENTRY') field = 'stock';
-    else field = 'leftover';
+    else if (context === 'PRODUCTION') field = 'leftover';
+    else field = 'consumed';
 
     onUpdate(selectedItem, field, delta);
   };
@@ -44,6 +45,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
         'PRODUCTION': { plus: 'bg-red-600 hover:bg-red-700', minus: 'bg-red-100 text-red-700 hover:bg-red-200' },
         'ENTRY':      { plus: 'bg-green-600 hover:bg-green-700', minus: 'bg-green-100 text-green-700 hover:bg-green-200' },
         'SALES':      { plus: 'bg-blue-600 hover:bg-blue-700', minus: 'bg-blue-100 text-blue-700 hover:bg-blue-200' },
+        'CONSUMPTION': { plus: 'bg-yellow-600 hover:bg-yellow-700', minus: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' },
       };
 
       const style = baseColors[context];
@@ -53,6 +55,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       if (isLarge && isPlus) return style.plus;
       if (isLarge && !isPlus) return context === 'SALES' ? 'bg-blue-200 text-blue-800 hover:bg-blue-300' : 
                                   context === 'PRODUCTION' ? 'bg-red-200 text-red-800 hover:bg-red-300' :
+                                  context === 'CONSUMPTION' ? 'bg-yellow-200 text-yellow-800 hover:bg-yellow-300' :
                                   'bg-green-200 text-green-800 hover:bg-green-300';
       
       return color;
@@ -102,7 +105,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             )}
 
             {/* Botões de Venda/Sobra (+10 / -10) */}
-            {(context === 'SALES' || context === 'PRODUCTION') && (
+            {(context === 'SALES' || context === 'PRODUCTION' || context === 'CONSUMPTION') && (
               <div className="grid grid-cols-2 gap-3">
                  <button 
                   onClick={() => handleManualSubmit(-10)}

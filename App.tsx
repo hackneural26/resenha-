@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Package, Flame, Save, Trash2, FileSpreadsheet, MessageCircle, Eraser, Settings, Phone, X, Plus } from 'lucide-react';
+import { ShoppingCart, Package, Flame, Save, Trash2, FileSpreadsheet, MessageCircle, Eraser, Settings, Phone, X, Plus, Coffee } from 'lucide-react';
 import { SkewerItem } from './types';
 import { INITIAL_ITEMS, PACK_SIZE } from './constants';
 import { ActionCard } from './components/ActionCard';
@@ -45,7 +45,7 @@ const App: React.FC = () => {
       let newStock = item.stock;
 
       // LÓGICA EM TEMPO REAL
-      if (field === 'sold') {
+      if (field === 'sold' || field === 'consumed') {
         // Se Vendeu (+delta), o estoque Diminui (-delta)
         // Se cancelou venda (-delta), o estoque Aumenta (--delta = +delta)
         newStock = item.stock - delta;
@@ -103,7 +103,8 @@ const App: React.FC = () => {
       name,
       stock: Math.max(0, stockValue),
       sold: 0,
-      leftover: 0
+      leftover: 0,
+      consumed: 0
     };
 
     setItems(prev => [...prev, newItem]);
@@ -124,11 +125,11 @@ const App: React.FC = () => {
   };
 
   const handleDownloadCSV = () => {
-    const headers = ["Data;Produto;Vendas(Unid);Sobras(Unid);Estoque Final(Cru)"];
+    const headers = ["Data;Produto;Vendas(Unid);Sobras(Unid);Consumo(Func.);Estoque Final(Cru)"];
     const today = new Date().toLocaleDateString('pt-BR');
     
     const rows = items.map(item => {
-      return `${today};${item.name};${item.sold};${item.leftover};${item.stock}`;
+      return `${today};${item.name};${item.sold};${item.leftover};${item.consumed};${item.stock}`;
     });
 
     const csvContent = [headers, ...rows].join("\n");
@@ -157,11 +158,11 @@ const App: React.FC = () => {
     // Generate WhatsApp Report
     let reportText = `*RELATÓRIO DE FECHAMENTO - ${new Date().toLocaleDateString()}*\n`;
     reportText += `----------------------------\n`;
-    reportText += `*PRODUTO* | *VENDA* | *SOBRA* | *ESTOQUE*\n`;
+    reportText += `*PRODUTO* | *VENDA* | *SOBRA* | *CONSUMO* | *ESTOQUE*\n`;
     
     items.forEach(item => {
-      if (item.sold > 0 || item.leftover > 0 || item.stock > 0) {
-        reportText += `${item.name}: ${item.sold} | ${item.leftover} | *${item.stock}*\n`;
+      if (item.sold > 0 || item.leftover > 0 || item.stock > 0 || item.consumed > 0) {
+        reportText += `${item.name}: ${item.sold} | ${item.leftover} | ${item.consumed} | *${item.stock}*\n`;
       }
     });
     reportText += `----------------------------\n`;
@@ -188,7 +189,8 @@ const App: React.FC = () => {
     const newItems = items.map(item => ({
       ...item,
       leftover: 0,
-      sold: 0
+      sold: 0,
+      consumed: 0
     }));
 
     setItems(newItems);
@@ -199,7 +201,8 @@ const App: React.FC = () => {
        const newItems = items.map(item => ({
            ...item,
            sold: 0,
-           leftover: 0
+           leftover: 0,
+           consumed: 0
            // Stock is explicitly preserved
        }));
        setItems(newItems);
@@ -212,7 +215,8 @@ const App: React.FC = () => {
               ...item,
               stock: 0,
               sold: 0,
-              leftover: 0
+              leftover: 0,
+              consumed: 0
           }));
           setItems(zeroedItems);
           alert("Sistema zerado! Lance a contagem inicial na Entrada.");
@@ -402,7 +406,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Action Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           
           {/* Section 1: Sales */}
           <ActionCard 
@@ -433,6 +437,17 @@ const App: React.FC = () => {
             colorClass="border-red-500"
             icon={<Flame className="w-5 h-5 text-red-600" />}
             description="Ao marcar, DEVOLVE ao estoque."
+            items={items}
+            onUpdate={handleUpdate}
+          />
+
+          {/* Section 4: Employee Consumption */}
+          <ActionCard 
+            title="4. Consumo Funcionário" 
+            context="CONSUMPTION"
+            colorClass="border-yellow-500"
+            icon={<Coffee className="w-5 h-5 text-yellow-600" />}
+            description="Consumo da equipe (TIRA do estoque)."
             items={items}
             onUpdate={handleUpdate}
           />
