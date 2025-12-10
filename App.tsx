@@ -154,23 +154,28 @@ const App: React.FC = () => {
     const confirmClose = window.confirm(
       "ENVIAR RELATÓRIO E ZERAR DIA?\n\n" +
       "1. Vai abrir o WhatsApp do Patrão.\n" +
-      "2. Vai ZERAR Vendas e Sobras da tela.\n" +
+      "2. Vai ZERAR Vendas, Sobras e Consumo da tela.\n" +
       "3. O ESTOQUE CRU continua valendo para amanhã.\n\n" +
       "Confirmar fechamento?"
     );
     if (!confirmClose) return;
 
+    // Helper to pad strings for alignment in monospace font
+    const pad = (text: string | number, length: number) => String(text).padEnd(length, ' ');
+
     // Generate WhatsApp Report
-    let reportText = `*RELATÓRIO DE FECHAMENTO - ${new Date().toLocaleDateString()}*\n`;
-    reportText += `----------------------------\n`;
-    reportText += `*PRODUTO* | *VENDA* | *SOBRA* | *CONSUMO* | *ESTOQUE*\n`;
+    let reportText = `*RELATÓRIO DE FECHAMENTO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
+    reportText += "```\n"; // Start monospace block
+    reportText += `${pad('PRODUTO', 14)}| ${pad('VEND', 5)}| ${pad('SOBR', 5)}| ${pad('CONS', 5)}| ${pad('ESTQ', 5)}\n`;
+    reportText += `-------------------------------------------\n`;
     
     items.forEach(item => {
       if (item.sold > 0 || item.leftover > 0 || item.stock > 0 || item.consumed > 0) {
-        reportText += `${item.name}: ${item.sold} | ${item.leftover} | ${item.consumed} | *${item.stock}*\n`;
+        reportText += `${pad(item.name, 14)}| ${pad(item.sold, 5)}| ${pad(item.leftover, 5)}| ${pad(item.consumed, 5)}| ${pad(item.stock, 5)}\n`;
       }
     });
-    reportText += `----------------------------\n`;
+    
+    reportText += "```\n\n"; // End monospace block
     reportText += `_Mestre da Grelha_`;
 
     const encodedText = encodeURIComponent(reportText);
