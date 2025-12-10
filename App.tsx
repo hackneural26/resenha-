@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Package, Flame, Save, Trash2, FileSpreadsheet, MessageCircle, Eraser, Settings, Phone, X, Plus, Coffee } from 'lucide-react';
+import { ShoppingCart, Package, Flame, Save, Trash2, Eraser, Settings, Phone, X, Plus, Coffee } from 'lucide-react';
 import { SkewerItem } from './types';
 import { INITIAL_ITEMS, PACK_SIZE } from './constants';
 import { ActionCard } from './components/ActionCard';
@@ -129,82 +129,7 @@ const App: React.FC = () => {
     setIsSettingsOpen(false);
   };
 
-  const handleDownloadCSV = () => {
-    const headers = ["Data;Produto;Vendas(Unid);Sobras(Unid);Consumo(Func.);Estoque Final(Cru)"];
-    const today = new Date().toLocaleDateString('pt-BR');
-    
-    const rows = items.map(item => {
-      return `${today};${item.name};${item.sold};${item.leftover};${item.consumed};${item.stock}`;
-    });
 
-    const csvContent = [headers, ...rows].join("\n");
-    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    
-    // Método simulando clique em link (funciona bem para downloads)
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Controle_Espetos_${today.replace(/\//g, '-')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleDayClosure = () => {
-    const confirmClose = window.confirm(
-      "ENVIAR RELATÓRIO E ZERAR DIA?\n\n" +
-      "1. Vai abrir o WhatsApp do Patrão.\n" +
-      "2. Vai ZERAR Vendas, Sobras e Consumo da tela.\n" +
-      "3. O ESTOQUE CRU continua valendo para amanhã.\n\n" +
-      "Confirmar fechamento?"
-    );
-    if (!confirmClose) return;
-
-    // Helper to pad strings for alignment in monospace font
-    const pad = (text: string | number, length: number) => String(text).padEnd(length, ' ');
-
-    // Generate WhatsApp Report
-    let reportText = `*RELATÓRIO DE FECHAMENTO - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
-    reportText += "```\n"; // Start monospace block
-    reportText += `${pad('PRODUTO', 14)}| ${pad('VEND', 5)}| ${pad('SOBR', 5)}| ${pad('CONS', 5)}| ${pad('ESTQ', 5)}\n`;
-    reportText += `-------------------------------------------\n`;
-    
-    items.forEach(item => {
-      if (item.sold > 0 || item.leftover > 0 || item.stock > 0 || item.consumed > 0) {
-        reportText += `${pad(item.name, 14)}| ${pad(item.sold, 5)}| ${pad(item.leftover, 5)}| ${pad(item.consumed, 5)}| ${pad(item.stock, 5)}\n`;
-      }
-    });
-    
-    reportText += "```\n\n"; // End monospace block
-    reportText += `_Mestre da Grelha_`;
-
-    const encodedText = encodeURIComponent(reportText);
-    
-    // Constrói a URL usando api.whatsapp.com (mais robusto que wa.me para web apps)
-    let waUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
-    if (bossPhone) {
-        waUrl += `&phone=55${bossPhone}`;
-    }
-
-    // Open WhatsApp immediately using Link Click simulation (bypasses some popup blockers)
-    const link = document.createElement('a');
-    link.href = waUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Reset daily counters
-    const newItems = items.map(item => ({
-      ...item,
-      leftover: 0,
-      sold: 0,
-      consumed: 0
-    }));
-
-    setItems(newItems);
-  };
 
   const handleClearDailyMetricsOnly = () => {
     if(window.confirm("LIMPAR APENAS VENDAS E SOBRAS?\n\n- Vendas vão para ZERO.\n- Sobras vão para ZERO.\n- ESTOQUE: MANTÉM O VALOR ATUAL.\n\nUse isso para limpar a tela sem perder a contagem do freezer.")) {
@@ -472,31 +397,7 @@ const App: React.FC = () => {
           <InventoryTable items={items} />
         </div>
 
-        {/* Closing Action Bar */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] md:relative md:bg-transparent md:border-none md:shadow-none md:p-0 md:mt-8 z-40">
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-3 md:justify-end">
-            
-            <button
-              onClick={handleDownloadCSV}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-sm transition-transform active:scale-95"
-            >
-              <FileSpreadsheet className="w-5 h-5" />
-              BAIXAR PLANILHA
-            </button>
-
-            <button
-              onClick={handleDayClosure}
-              className="flex-[2] md:flex-none flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-transform active:scale-95"
-            >
-              <MessageCircle className="w-5 h-5" />
-              ENVIAR WHATSAPP E FECHAR
-            </button>
-            
-          </div>
-          <p className="text-center text-[10px] uppercase tracking-wider text-gray-400 mt-3 md:text-right">
-            O fechamento zera Vendas/Sobras mas preserva o Estoque.
-          </p>
-        </div>
+        {/* Closing Action Bar Removed */}
 
       </main>
     </div>
