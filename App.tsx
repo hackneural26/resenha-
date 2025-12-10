@@ -10,7 +10,12 @@ const App: React.FC = () => {
   const [items, setItems] = useState<SkewerItem[]>(() => {
     const saved = localStorage.getItem('grelha-stock-v5');
     if (saved) {
-        return JSON.parse(saved);
+      const parsedItems: SkewerItem[] = JSON.parse(saved);
+      // Data migration: ensure all items have the 'consumed' property
+      return parsedItems.map(item => ({
+        ...item,
+        consumed: item.consumed || 0,
+      }));
     }
     return INITIAL_ITEMS;
   });

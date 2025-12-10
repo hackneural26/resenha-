@@ -105,7 +105,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             )}
 
             {/* Botões de Venda/Sobra (+10 / -10) */}
-            {(context === 'SALES' || context === 'PRODUCTION' || context === 'CONSUMPTION') && (
+            {(context === 'SALES' || context === 'PRODUCTION') && (
               <div className="grid grid-cols-2 gap-3">
                  <button 
                   onClick={() => handleManualSubmit(-10)}
@@ -120,6 +120,26 @@ export const ActionCard: React.FC<ActionCardProps> = ({
                 >
                   <Plus className="w-5 h-5" />
                   +10
+                </button>
+              </div>
+            )}
+
+            {/* Botões de Consumo (+2 / -2) */}
+            {context === 'CONSUMPTION' && (
+              <div className="grid grid-cols-2 gap-3">
+                 <button 
+                  onClick={() => handleManualSubmit(-2)}
+                  className={`py-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 ${getButtonColor(false, true)}`}
+                >
+                  <Minus className="w-5 h-5" />
+                  -2
+                </button>
+                <button 
+                  onClick={() => handleManualSubmit(2)}
+                  className={`py-4 rounded-xl font-bold text-white transition-colors shadow-sm flex items-center justify-center gap-2 ${getButtonColor(true, true)}`}
+                >
+                  <Plus className="w-5 h-5" />
+                  +2
                 </button>
               </div>
             )}
