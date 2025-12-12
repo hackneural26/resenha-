@@ -14,7 +14,6 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
             <tr>
               <th className="px-4 py-3 font-semibold">Produto</th>
               <th className="px-4 py-3 bg-green-700 text-center" title="Entrada Seção 2">Estoque (Cru)</th>
-              <th className="px-4 py-3 bg-red-700 text-center" title="Entrada Seção 3">Sobras (Assado)</th>
               <th className="px-4 py-3 bg-yellow-700 text-center" title="Entrada Seção 4">Consumo (Func.)</th>
               <th className="px-4 py-3 bg-blue-700 text-center" title="Entrada Seção 1">Vendido (Cx)</th>
             </tr>
@@ -25,7 +24,6 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({ items }) => {
                 <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   <td className="px-4 py-3 font-medium text-gray-900">{item.name}</td>
                   <td className="px-4 py-3 text-center font-bold text-green-700 bg-green-50 text-lg">{item.stock}</td>
-                  <td className="px-4 py-3 text-center font-bold text-red-700 bg-red-50 text-lg">{item.leftover}</td>
                   <td className="px-4 py-3 text-center font-bold text-yellow-700 bg-yellow-50 text-lg">{item.consumed}</td>
                   <td className="px-4 py-3 text-center text-blue-600 font-bold text-lg">{item.sold}</td>
                 </tr>

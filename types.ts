@@ -3,15 +3,13 @@ export interface SkewerItem {
   name: string;
   stock: number;   // Estoque Cru (Input via Entrada)
   sold: number;    // Vendido (Input via Vendas - Referência de Saída)
-  leftover: number;// Sobras (Input via Produção - Assado que não vendeu)
   consumed: number; // Consumido por funcionários
 }
 
-export type InputContext = 'SALES' | 'ENTRY' | 'PRODUCTION' | 'CONSUMPTION';
+export type InputContext = 'SALES' | 'ENTRY' | 'CONSUMPTION';
 
 export interface AIProcessResult {
   itemId: string | null;
   quantity: number;
   actionType: 'ADD' | 'SUBTRACT' | 'SET';
-  subType?: 'LEFTOVER'; // Only for Production context
 }

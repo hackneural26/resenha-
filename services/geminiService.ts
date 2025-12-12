@@ -37,13 +37,11 @@ export const parseVoiceInput = async (
     1. Identify the item ID based on the text (e.g., "bife" -> "contra_file", "bayco" -> "frango_bacon" or "carne_bacon").
     2. Identify the quantity.
     3. If context is 'ENTRY' (Estoque), check if user mentions "pacote", "fardo", "caixa". If so, multiply quantity by 10.
-    4. If context is 'PRODUCTION', determine if it is 'GRILLED' (assado/saiu/grelha) or 'LEFTOVER' (sobrou/voltou/frio). Default to 'GRILLED' if ambiguous.
     
     Return ONLY valid JSON:
     {
       "itemId": "string_id_or_null",
-      "quantity": number,
-      "subType": "GRILLED" | "LEFTOVER" (only if context is PRODUCTION, otherwise null)
+      "quantity": number
     }
   `;
 
@@ -63,8 +61,7 @@ export const parseVoiceInput = async (
     return {
       itemId: parsed.itemId,
       quantity: parsed.quantity || 0,
-      actionType: 'ADD', // Default behavior for voice is adding to the tally
-      subType: parsed.subType
+      actionType: 'ADD' // Default behavior for voice is adding to the tally
     };
 
   } catch (error) {

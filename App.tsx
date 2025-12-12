@@ -54,10 +54,6 @@ const App: React.FC = () => {
         // Se Vendeu (+delta), o estoque Diminui (-delta)
         // Se cancelou venda (-delta), o estoque Aumenta (--delta = +delta)
         newStock = item.stock - delta;
-      } else if (field === 'leftover') {
-        // Se Sobrou/Voltou (+delta), o estoque Aumenta (+delta) (volta pro freezer)
-        // Se cancelou sobra (-delta), o estoque Diminui (-delta)
-        newStock = item.stock + delta;
       } else if (field === 'stock') {
         // Se for Entrada direta (campo 2), atualiza o estoque diretamente
         newStock = newValue;
@@ -108,7 +104,6 @@ const App: React.FC = () => {
       name,
       stock: Math.max(0, stockValue),
       sold: 0,
-      leftover: 0,
       consumed: 0
     };
 
@@ -136,7 +131,6 @@ const App: React.FC = () => {
        const newItems = items.map(item => ({
            ...item,
            sold: 0,
-           leftover: 0,
            consumed: 0
            // Stock is explicitly preserved
        }));
@@ -150,7 +144,6 @@ const App: React.FC = () => {
               ...item,
               stock: 0,
               sold: 0,
-              leftover: 0,
               consumed: 0
           }));
           setItems(zeroedItems);
@@ -324,7 +317,7 @@ const App: React.FC = () => {
             <p className="text-gray-600">
                {!bossPhone ? 
                  <span className="text-red-600 font-bold flex items-center gap-1">⚠ Clique na engrenagem acima para configurar o Zap do Patrão!</span> : 
-                 "Sistema pronto. Vendas baixam estoque, Sobras devolvem ao estoque."
+                 "Sistema pronto. Vendas baixam o estoque."
                }
             </p>
           </div>
@@ -332,10 +325,6 @@ const App: React.FC = () => {
              <div className="flex items-center gap-1">
                 <span className="w-3 h-3 rounded-full bg-blue-500"></span>
                 <span>Venda (Baixa Estoque)</span>
-             </div>
-             <div className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                <span>Sobra (Volta Estoque)</span>
              </div>
           </div>
         </div>
@@ -361,17 +350,6 @@ const App: React.FC = () => {
             colorClass="border-green-500"
             icon={<Package className="w-5 h-5 text-green-600" />}
             description="Lançar o Estoque Real."
-            items={items}
-            onUpdate={handleUpdate}
-          />
-
-          {/* Section 3: Production (Leftovers Only) */}
-          <ActionCard 
-            title="3. Sobras (Volta Frio)" 
-            context="PRODUCTION"
-            colorClass="border-red-500"
-            icon={<Flame className="w-5 h-5 text-red-600" />}
-            description="Ao marcar, DEVOLVE ao estoque."
             items={items}
             onUpdate={handleUpdate}
           />
